@@ -30,7 +30,7 @@ public class SpringSecurityAESEncryptor implements SpringSecurityEncryptor {
     @PostConstruct
     private void init() throws NoSuchAlgorithmException {
         if (ObjectUtils.isEmpty(configuration) || StringUtils.isEmpty(configuration.getPublicKey())){
-            secretKey = SpringDataSecurityKeyFactory.AES(ObjectUtils.isEmpty(configuration) ? 128 : configuration.getInitialize());
+            secretKey = SpringDataSecurityKeyFactory.AES(128);
             String key = Base64.getEncoder().encodeToString(secretKey.getEncoded());
             configuration.setPublicKey(key);
             System.out.println("AES公钥：" + key);

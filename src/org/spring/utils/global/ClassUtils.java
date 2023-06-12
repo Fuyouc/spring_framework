@@ -1,5 +1,9 @@
 package org.spring.utils.global;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import org.omg.CORBA.SystemException;
+import org.spring.utils.environment.EnvironmentUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
 
@@ -137,13 +141,20 @@ public class ClassUtils {
      * @return
      */
     public static String getClassURL(Class<?> objClass) throws UnsupportedEncodingException {
-//        String path = objClass.getResource("").getPath();
         String path = objClass.getProtectionDomain().getCodeSource().getLocation().getFile();
         path = java.net.URLDecoder.decode(path, "UTF-8");
         String packName = objClass.getPackage().getName().replaceAll("\\.","/");
         String scanPath = path + packName;
-        scanPath = scanPath.charAt(0) == '/' ? scanPath.substring(1,scanPath.length()) : scanPath;
-        scanPath = scanPath.replaceAll("/","\\\\");
+        switch (EnvironmentUtils.getSystem()){
+            case WINDOWS:
+                scanPath = scanPath.charAt(0) == '/' ? scanPath.substring(1,scanPath.length()) : scanPath;
+                scanPath = scanPath.replaceAll("/","\\\\");
+                break;
+            case MAC:
+                break;
+            default:
+                throw new UnknownError("框架暂时不支持当前操作系统，请与开发人员反馈。");
+        }
         return scanPath;
     }
 

@@ -28,4 +28,20 @@ public class EnvironmentUtils {
 
         return isJar;
     }
+
+    /**
+     * 获取操作系统类型
+     */
+    public static OperatingSystem getSystem(){
+        String osName = System.getProperty("os.name").toLowerCase();
+        if (osName.contains("win")) {
+            // Windows系统
+            return OperatingSystem.WINDOWS;
+        } else if (osName.contains("mac")) {
+            // Mac系统
+            return OperatingSystem.MAC;
+        } else {
+            return OperatingSystem.UNKNOWN;
+        }
+    }
 }

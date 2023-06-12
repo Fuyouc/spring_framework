@@ -26,8 +26,6 @@ import java.util.Base64;
  */
 public class SpringSecurityRSAEncryptor implements SpringSecurityAsymmetricEncryptor {
 
-    public String name = "默认的";
-
     private static final String ALGORITHM = "RSA";
     @Autowired
     private SpringSecurityConfiguration configuration;
@@ -164,7 +162,7 @@ public class SpringSecurityRSAEncryptor implements SpringSecurityAsymmetricEncry
      */
     @Override
     public String encrypt(String data) throws Exception {
-        return privateEncrypt(data);
+        return publicEncrypt(data);
     }
 
     @Override

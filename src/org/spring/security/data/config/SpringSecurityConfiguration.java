@@ -9,6 +9,7 @@ public class SpringSecurityConfiguration {
     private String publicKey;
     private String privateKey;
     private int initialize;
+    private String salt;
 
     public String getPublicKey() {
         return publicKey;
@@ -32,6 +33,14 @@ public class SpringSecurityConfiguration {
 
     public void setInitialize(int initialize) {
         this.initialize = initialize;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     @Override

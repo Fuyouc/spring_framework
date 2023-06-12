@@ -160,6 +160,8 @@ spring.security.data.public-key=
 spring.security.data.private-key=
 #初始化秘钥长度
 spring.security.data.initialize=
+#配置秘钥生成的盐（防止重复秘钥）
+spring.security.data.salt=
 ```
 
 ## 5、JDBC
@@ -493,7 +495,7 @@ spring.web.resources.location=
 
 ```java
 /**
- * 在启动类上标志 @EnableSpringSecurity 表示开启数据加密
+ * 在启动类上标志 @EnableSpringSecurity 表示开启SpringSecurity
  */
 @EnableSpringSecurity
 @SpringBootApplication
@@ -526,6 +528,32 @@ spring.security.data.public-key=
 spring.security.data.private-key=
 #配置秘钥生成长度。如果没有配置公钥与秘钥，那么在启动时会自动生成指定长度的秘钥
 spring.security.data.initialize=
+#配置秘钥生成的盐（防止重复秘钥）
+spring.security.data.salt=
+```
+
+```java
+@Controller(prefix = "/user")
+public class UserController {
+
+    /**
+     * 在开启Security后，所有的 POST application/json 请求都会被拦截解密
+     */
+    @RequestMapping(value = "/login",method = HttpRequestMethod.POST)
+    public void login(@RequestBody Map<String,Object> map){
+        ......
+    }
+
+    /**
+     * 如果不需要被Security解密的操作，则在方法上使用@SecurityIgnore表示忽略该请求
+     */
+    @SecurityIgnore
+    @RequestMapping("/getInfo")
+    public Object getInfo(@RequestBody User user){
+
+    }
+
+}
 ```
 
 # 3、框架开发

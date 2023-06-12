@@ -42,7 +42,7 @@ public final class SpringWebControllerExceptionHandler {
                                     Object[] value = new Object[3];
                                     value[0] = request;
                                     value[1] = response;
-                                    value[2] = e.getCause();
+                                    value[2] = e;
                                     method.invoke(target,value);
                                 }
                             }catch (Exception es){

@@ -22,15 +22,11 @@ public class SpringSecurityWebInterceptor implements SpringWebInterceptor {
     private SpringSecurityEncryptor dataEncryptor;
 
     @Override
-    public boolean beforeHandler(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Method method, Object controller) {
+    public boolean beforeHandler(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Method method, Object controller) throws Exception{
         if (check(httpServletRequest,method)){
             SpringWebServletRequestWrapper requestWrapper = (SpringWebServletRequestWrapper) httpServletRequest;
-            try {
-                String decrypt = dataEncryptor.decrypt(requestWrapper.getBodyString());
-                requestWrapper.setBody(decrypt);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            String decrypt = dataEncryptor.decrypt(requestWrapper.getBodyString());
+            requestWrapper.setBody(decrypt);
         }
         return false;
     }

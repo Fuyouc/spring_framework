@@ -13,7 +13,7 @@ public interface SpringWebInterceptor {
      * Controller method before execution
      * @return false表示放行，true表示拦截
      */
-    boolean beforeHandler(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Method method,Object controller);
+    boolean beforeHandler(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, Method method,Object controller) throws Exception;
 
     /**
      * Controller method after execution

@@ -75,15 +75,18 @@ public final class JsonUtils {
             Map.Entry<String, Object> entry = iterator.next();
             String key = entry.getKey();
             Object value = entry.getValue();
-            tow:
-            if (!ClassUtils.isWrapClass(value.getClass())) {
+            if (!ObjectUtils.isEmpty(value)) {
+                if (!ClassUtils.isWrapClass(value.getClass())) {
+                    sb.append("\"" + key + "\"" + ":" +  toString(value) + ",\n");
+                } else {
+                    sb.append(basic(key,value) + ",\n");
+                }
+            }else {
                 sb.append("\"" + key + "\"" + ":" +  toString(value) + ",\n");
-            } else {
-                sb.append(basic(key,value) + ",\n");
             }
         }
         sb.append("}");
-        if (map.size() > 0) {
+        if (map.size() > 4) {
             sb.deleteCharAt(sb.lastIndexOf(","));
         }
         return sb.toString();
@@ -94,16 +97,18 @@ public final class JsonUtils {
         List<Object> list = (List<Object>) value;
         for (int i = 0; i < list.size(); i++) {
             Object targetObject = list.get(i);
-            if (Map.class.isAssignableFrom(targetObject.getClass())){
-                sb.append(map(targetObject) + ",\n");
-            }else if (!ClassUtils.isWrapClass(targetObject.getClass())){
-                sb.append(object(targetObject) + ",\n");
-            }else {
-                sb.append(targetObject + ",\n");
+            if (!ObjectUtils.isEmpty(targetObject)) {
+                if (Map.class.isAssignableFrom(targetObject.getClass())) {
+                    sb.append(map(targetObject) + ",\n");
+                } else if (!ClassUtils.isWrapClass(targetObject.getClass())) {
+                    sb.append(object(targetObject) + ",\n");
+                } else {
+                    sb.append(targetObject + ",\n");
+                }
             }
         }
         sb.append("]");
-        if (list.size() != 0) {
+        if (list.size() > 4) {
             sb.deleteCharAt(sb.lastIndexOf(","));
         }
         return sb.toString();

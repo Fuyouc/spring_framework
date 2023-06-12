@@ -140,7 +140,11 @@ public class SpringWebRequestBodyAnnotationHandler implements SpringWebRequestPa
             JSONArray jsonArray = (JSONArray) json;
             for (int i = 0; i < jsonArray.size(); i++) {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
-                list.add(map(jsonObject));
+                if (!ObjectUtils.isEmpty(jsonObject)){
+                    list.add(map(jsonObject));
+                }else {
+                    list.add(jsonArray.get(i));
+                }
             }
             return list;
         }

@@ -65,7 +65,10 @@ public class SpringWebRequestParamAnnotationHandler implements SpringWebRequestP
                 Map.Entry<String, Object> list = list(field.getName(), request);
                 field.set(targetObject,list.getValue());
             }else if (ClassUtils.isWrapClass(field.getType())){
-                field.set(targetObject,basic(field.getType(),request.getParameter(field.getName())));
+                Object value = basic(field.getType(), request.getParameter(field.getName()));
+                if (!ObjectUtils.isEmpty(value)) {
+                    field.set(targetObject,value);
+                }
             }
         }
         return new AbstractMap.SimpleEntry<>(parameter.getName(),targetObject);

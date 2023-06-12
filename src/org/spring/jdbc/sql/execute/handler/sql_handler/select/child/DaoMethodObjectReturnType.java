@@ -8,6 +8,7 @@ import org.spring.jdbc.annotation.TableField;
 import org.spring.jdbc.sql.execute.handler.sql_handler.select.DaoMethodReturnTypeHandler;
 import org.spring.jdbc.utils.JdbcUtils;
 import org.spring.utils.global.ClassUtils;
+import org.spring.utils.global.ObjectUtils;
 import org.spring.utils.global.StringUtils;
 
 import java.lang.reflect.Field;
@@ -44,7 +45,10 @@ public class DaoMethodObjectReturnType implements DaoMethodReturnTypeHandler {
                                 fieldName = field.getName(); //如果字段名，则使用类名中的字段名
                             }
                         }
-                        field.set(target,resultSet.getObject(resultSet.findColumn(fieldName))); //根据字段名称与数据库列关联，并赋值到对象上
+                        Object object = resultSet.getObject(resultSet.findColumn(fieldName));
+                        if (!ObjectUtils.isEmpty(object)) {
+                            field.set(target, object); //根据字段名称与数据库列关联，并赋值到对象上
+                        }
                     } catch (IllegalAccessException e) {
                         e.printStackTrace();
                     }

@@ -88,7 +88,10 @@ public class SpringWebRequestPartAnnotationHandler implements SpringWebRequestPa
         for (Field field : targetClass.getDeclaredFields()) {
             field.setAccessible(true);
             if (ClassUtils.isWrapClass(field.getType())){
-                field.set(target,StringUtils.basicType(field.getType(), (String) body.get(field.getName())));
+                Object value = body.get(field.getName());
+                if (!ObjectUtils.isEmpty(value)) {
+                    field.set(target, StringUtils.basicType(field.getType(), (String) value));
+                }
             }else if (MultipartFile.class.isAssignableFrom(field.getType())){
                 List<MultipartFile> files = (List<MultipartFile>) body.get(field.getName());
                 if (!ObjectUtils.isEmpty(files)){

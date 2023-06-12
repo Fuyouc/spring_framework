@@ -102,7 +102,9 @@ public class SpringWebRequestBodyAnnotationHandler implements SpringWebRequestPa
                     field.set(target,list((Class<?>) elementType,valueJsonObject));
                 }
             }else {
-                field.set(target,StringUtils.basicType(field.getType(), String.valueOf(value)));
+                if (!ObjectUtils.isEmpty(value)) {
+                    field.set(target, StringUtils.basicType(field.getType(), String.valueOf(value)));
+                }
             }
         }
         return target;

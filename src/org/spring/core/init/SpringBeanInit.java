@@ -33,8 +33,6 @@ public final class SpringBeanInit {
         for (SpringBeanClassHandler classHandler : classHandlers) {
             classHandler.handler(beanName,bean,bean.getClass());
         }
-        initField(beanName,bean);
-        initMethod(beanName,bean);
     }
 
     public static void initField(String beanName, Object bean){

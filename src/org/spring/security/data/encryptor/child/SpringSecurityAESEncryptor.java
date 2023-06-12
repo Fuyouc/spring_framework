@@ -35,7 +35,7 @@ public class SpringSecurityAESEncryptor implements SpringSecurityEncryptor {
             configuration.setPublicKey(key);
             System.out.println("AES公钥：" + key);
         }else {
-            secretKey = new SecretKeySpec(Base64.getDecoder().decode(configuration.getPrivateKey()),"AES");
+            secretKey = new SecretKeySpec(Base64.getDecoder().decode(configuration.getPublicKey()),"AES");
         }
     }
 

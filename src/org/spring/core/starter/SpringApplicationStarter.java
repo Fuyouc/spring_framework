@@ -49,7 +49,15 @@ public class SpringApplicationStarter implements SpringWebFrameworkStarter{
     private void init() {
         List<Map.Entry<String, Object>> beanList = Application.getApplicationContext().getFactory().getBeanFactory().getBeanList();
         for (Map.Entry<String, Object> bean : beanList) {
-            SpringBeanInit.initBean(bean.getKey(),bean.getValue());
+            SpringBeanInit.initClass(bean.getKey(),bean.getValue());
+        }
+
+        for (Map.Entry<String, Object> bean : beanList) {
+            SpringBeanInit.initField(bean.getKey(),bean.getValue());
+        }
+
+        for (Map.Entry<String, Object> bean : beanList) {
+            SpringBeanInit.initMethod(bean.getKey(),bean.getValue());
         }
     }
 

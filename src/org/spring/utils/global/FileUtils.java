@@ -1,5 +1,7 @@
 package org.spring.utils.global;
 
+import org.spring.utils.environment.EnvironmentUtils;
+
 import java.io.File;
 
 /**
@@ -17,7 +19,7 @@ public class FileUtils {
      * @return
      */
     public static String getFileClassPath(Class<?> applicationClass,File file){
-       if (!isClassFile(file)) return null; //如果不是.class 结尾，则直接返回
+        if (!isClassFile(file)) return null; //如果不是.class 结尾，则直接返回
         String classPath = file.getPath().substring(applicationClass.getResource("/").getPath().length() - 1,file.getPath().length()); //获取类路径
         classPath = classPath.substring(0,classPath.indexOf(".")); //截取掉.class
         switch (EnvironmentUtils.getSystem()){

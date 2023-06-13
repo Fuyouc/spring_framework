@@ -421,6 +421,7 @@ public class MyInterceptor implements SpringWebInterceptor {
 /**
  * 使用@ControllerAdvice表示该类是一个Controller异常处理器
  */
+@Component
 @ControllerAdvice
 public class MyControllerExceptionHandler {
 

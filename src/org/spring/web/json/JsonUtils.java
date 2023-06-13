@@ -86,7 +86,7 @@ public final class JsonUtils {
             }
         }
         sb.append("}");
-        if (map.size() > 4) {
+        if (map.size() > 0) {
             sb.deleteCharAt(sb.lastIndexOf(","));
         }
         return sb.toString();
@@ -108,7 +108,7 @@ public final class JsonUtils {
             }
         }
         sb.append("]");
-        if (list.size() > 4) {
+        if (list.size() > 0) {
             sb.deleteCharAt(sb.lastIndexOf(","));
         }
         return sb.toString();

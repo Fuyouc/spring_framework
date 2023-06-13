@@ -4,7 +4,7 @@ package org.spring.web.server.servlet.handler.http;
 import org.spring.annotations.autoconfig.Autowired;
 import org.spring.annotations.autoconfig.Component;
 import org.spring.utils.global.ObjectUtils;
-import org.spring.web.config.SpringWebResourceConfiguration;
+import org.spring.web.autoconfig.SpringWebResourceConfiguration;
 import org.spring.web.server.servlet.SpringHttpServletHandler;
 import org.spring.web.server.servlet.resource.WebStaticResourcesManager;
 import org.spring.web.server.servlet.resource.child.FileResourcesManager;

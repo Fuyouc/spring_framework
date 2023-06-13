@@ -4,7 +4,7 @@ import org.spring.Application;
 import org.spring.annotations.PostConstruct;
 import org.spring.annotations.autoconfig.Autowired;
 import org.spring.annotations.autoconfig.Component;
-import org.spring.web.config.SpringWebResourceConfiguration;
+import org.spring.web.autoconfig.SpringWebResourceConfiguration;
 
 import java.io.*;
 

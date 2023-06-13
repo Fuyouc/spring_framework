@@ -17,6 +17,7 @@ import org.spring.web.server.servlet.interceptor.SpringWebInterceptor;
 import org.spring.web.server.servlet.response.SpringWebHttpResponseParser;
 import org.spring.web.server.servlet.utils.ServletUtils;
 
+import javax.el.MethodNotFoundException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -93,12 +94,12 @@ public class SpringWebHttpAPIServletHandler implements SpringHttpServletHandler 
         switch (requestMethod){
             case GET:
                 if (!request.getMethod().equals("GET")){
-                    throw new HttpRequestMethodNotSupportedException("这不是一个 GET 请求");
+                    throw new MethodNotFoundException("不支持GET请求");
                 }
                 break;
             case POST:
                 if (!request.getMethod().equals("POST")){
-                    throw new HttpRequestMethodNotSupportedException("这不是一个 POST 请求");
+                    throw new MethodNotFoundException("不支持POST请求");
                 }
                 break;
         }

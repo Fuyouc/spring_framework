@@ -103,7 +103,7 @@ public final class JsonUtils {
                 } else if (!ClassUtils.isWrapClass(targetObject.getClass())) {
                     sb.append(object(targetObject) + ",\n");
                 } else {
-                    sb.append(targetObject + ",\n");
+                    sb.append("\"" + targetObject + "\"" + ",\n");
                 }
             }
         }

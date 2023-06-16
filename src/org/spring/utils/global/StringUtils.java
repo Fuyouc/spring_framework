@@ -173,9 +173,24 @@ public class StringUtils {
         if (!isEmpty(parameterString)){
             Map<String,Object> map = new HashMap<>();
             String[] split = parameterString.split("&");
-            for (String value : split) {
-                String[] parameter = value.split("=");
-                map.put(parameter[0],parameter.length == 2 ? parameter[1] : null);
+            for (String params : split) {
+                String[] parameter = params.split("=");
+                String key = parameter[0];
+                String value = parameter.length == 2 ? parameter[1] : null;
+                if (map.containsKey(key)){
+                    Object oldValue = map.get(key);
+                    if (List.class.isInstance(oldValue)){
+                        List<Object> list = (List<Object>) oldValue;
+                        list.add(value);
+                    }else {
+                        List<Object> list = new ArrayList<>();
+                        list.add(oldValue);
+                        list.add(value);
+                        map.put(key,list);
+                    }
+                }else {
+                    map.put(key,value);
+                }
             }
             return map;
         }

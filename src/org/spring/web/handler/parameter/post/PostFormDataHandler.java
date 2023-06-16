@@ -30,13 +30,27 @@ public class PostFormDataHandler implements PostMethodParameterHandler {
     private static int DEFAULT_FACTOR = 1024;
 
     @Override
-    public Map.Entry<Boolean,  Map<String,Object>> handler(HttpServletRequest request, Method method, Parameter parameter) {
+    public Map.Entry<Boolean,Map<String,Object>> handler(HttpServletRequest request, Method method, Parameter parameter) {
         Map<String,Object> map = new HashMap<>();
         String bodyString = ((SpringWebServletRequestWrapper) request).getBodyString(); //获取bodyString
+        System.out.println(bodyString);
         StringUtils.getPostFormBodyData(bodyString, new PostFormDataBodyListener() {
             @Override
             public void parameter(int position,String key, String value) {
-                map.put(key,value);
+                if (map.containsKey(key)){
+                    Object oldValue = map.get(key);
+                    if (List.class.isInstance(oldValue)){
+                        List<Object> list = (List<Object>) oldValue;
+                        list.add(value);
+                    }else {
+                        List<Object> list = new ArrayList<>();
+                        list.add(oldValue);
+                        list.add(value);
+                        map.put(key,list);
+                    }
+                }else {
+                    map.put(key,value);
+                }
             }
 
             @Override
@@ -99,6 +113,7 @@ public class PostFormDataHandler implements PostMethodParameterHandler {
 
     @Override
     public boolean allow(HttpServletRequest request) {
+
         if (request.getContentType().startsWith("multipart/form-data")){
             return true;
         };

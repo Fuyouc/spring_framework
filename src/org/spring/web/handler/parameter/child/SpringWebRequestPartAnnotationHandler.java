@@ -1,5 +1,6 @@
 package org.spring.web.handler.parameter.child;
 
+import com.sun.org.apache.bcel.internal.generic.LUSHR;
 import org.spring.annotations.autoconfig.Autowired;
 import org.spring.annotations.autoconfig.Component;
 import org.spring.utils.global.ClassUtils;
@@ -35,6 +36,8 @@ public class SpringWebRequestPartAnnotationHandler implements SpringWebRequestPa
     public Map.Entry<Boolean,Object> handler(HttpServletRequest request, HttpServletResponse response, Method method, Parameter parameter, Map<String,Object> cache) throws Exception{
         if (!request.getMethod().equals("POST")) throw new HttpRequestMethodNotSupportedException("不是一个POST请求，无法获取@RequestPart的参数");
         if (request.getContentType().startsWith("application/json")) return null;
+
+
         Map<String,Object> body = null;
         if (cache.isEmpty()){
             //如果缓存为空，则从请求体中获取数据
@@ -43,7 +46,9 @@ public class SpringWebRequestPartAnnotationHandler implements SpringWebRequestPa
             }else if (formDataHandler.allow(request)){
                 body = formDataHandler.handler(request,method,parameter).getValue();
             }
-            cache.putAll(body);
+            if (body != null) {
+                cache.putAll(body);
+            }
         }else {
             //否则使用缓存的内容
             body = cache;

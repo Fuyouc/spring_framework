@@ -2,6 +2,7 @@ package org.spring.jdbc.sql.execute.handler.sql_handler.select.child;
 
 
 import org.spring.annotations.autoconfig.Component;
+import org.spring.jdbc.sql.DaoMethod;
 import org.spring.jdbc.sql.execute.handler.sql_handler.select.DaoMethodReturnTypeHandler;
 
 import java.lang.reflect.Method;
@@ -17,7 +18,7 @@ import java.util.Map;
 @Component
 public class DaoMethodMapReturnType implements DaoMethodReturnTypeHandler {
     @Override
-    public Object handler(Method method, ResultSet resultSet) {
+    public Object handler(DaoMethod daoMethod, ResultSet resultSet) {
         Map<String,Object> map = new HashMap<>();
         try {
             ResultSetMetaData metaData = resultSet.getMetaData();

@@ -1,5 +1,7 @@
 package org.spring.jdbc.sql.execute.handler.sql_handler.select;
 
+import org.spring.jdbc.sql.DaoMethod;
+
 import java.lang.reflect.Method;
 import java.sql.ResultSet;
 
@@ -14,5 +16,5 @@ public interface DaoMethodReturnTypeHandler {
     /**
      * 处理Dao方法各种类型的返回值
      */
-    Object handler(Method method, ResultSet resultSet);
+    Object handler(DaoMethod daoMethod, ResultSet resultSet);
 }

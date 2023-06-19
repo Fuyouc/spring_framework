@@ -3,6 +3,9 @@ package org.spring.core.starter;
 import org.spring.Application;
 import org.spring.SpringApplication;
 import org.spring.annotations.SpringBootApplication;
+import org.spring.core.container.files.FileFactory;
+import org.spring.core.container.files.SpringFile;
+import org.spring.core.handler.SpringFileHandler;
 import org.spring.core.init.SpringBeanInit;
 import org.spring.core.loader.SpringFrameWorkClassLoader;
 import org.spring.core.resources.SpringFrameworkResourceManager;
@@ -43,6 +46,15 @@ public class SpringApplicationStarter implements SpringWebFrameworkStarter{
         List<SpringFrameworkResourceManager> resourceManagers = Application.getApplicationContext().getFactory().getBeanFactory().getInterfaceBYList(SpringFrameworkResourceManager.class);
         for (SpringFrameworkResourceManager resourceManager : resourceManagers) {
             resourceManager.handler();
+        }
+
+        FileFactory fileFactory = Application.getApplicationContext().getFactory().getFileFactory();
+        for (SpringFile file : fileFactory.getFiles()) {
+            h:for (SpringFileHandler springFileHandler : Application.getApplicationContext().getFactory().getBeanFactory().getInterfaceBYList(SpringFileHandler.class)) {
+                if (springFileHandler.handler(file)){
+                    break h;
+                }
+            }
         }
     }
 

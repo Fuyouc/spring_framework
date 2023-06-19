@@ -1,9 +1,13 @@
 package org.spring.core.scanner.child;
 
 import org.spring.Application;
+import org.spring.core.container.files.SpringFile;
 import org.spring.core.loader.SpringFrameWorkClassLoader;
 import org.spring.core.scanner.SpringWebClassScanner;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.net.JarURLConnection;
 import java.net.URL;
 import java.util.Enumeration;
@@ -40,6 +44,12 @@ public class JarEnvironmentClassScanner implements SpringWebClassScanner {
                                     String className = jarEntryName.substring(0, jarEntryName.lastIndexOf(".")).replace("/", ".");
                                     Class cls = Class.forName(className);
                                     SpringFrameWorkClassLoader.loadClass(cls);
+                                }else {
+                                    try {
+                                        Application.getApplicationContext().getFactory().getFileFactory().add(new SpringFile(jarEntryName,jarFile.getInputStream(entry)));
+                                    } catch (FileNotFoundException e) {
+                                        throw new RuntimeException(e);
+                                    }
                                 }
                             }
                         }

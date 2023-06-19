@@ -1,4 +1,4 @@
-# 1、使用前置
+#   1、使用前置
 
 - **注意：由于JDK原因，在编译后所有的参数名都会变成arg1,arg2等，这个时候反射就没办法正常使用，需要进行配置** 
 
@@ -209,9 +209,8 @@ spring.datasource.map-underscore-to-camel-case=
 public interface UserDao {
     /**
      * 表示当前方法为添加方法
-     * autoSplicing：会将VALUES里面的#{}参数名添加到user()表后面，快速确认需要插入的字段
      */
-    @Insert(value = "INSERT INTO user VALUES(#{name},#{pwd})",autoSplicing = true)
+    @Insert(value = "INSERT INTO user VALUES(#{user.name},#{user.pwd})")
     int add(User user);
 
     /**
@@ -227,6 +226,251 @@ public interface UserDao {
     Map<String,Object> getUserById(@Param("id") int id);
 }
 ```
+
+### Mapper映射文件
+
+由于在接口上使用`注解`对于SQL的编写有极大的限制，所以推出了使用`xml`文件进行SQL编写。xml文件可以大大增强平常的业务逻辑SQL，并且支持动态SQL的操作。
+
+**映射文件可以存放在启动类下的任意位置。**
+
+需要注意的是：**如果接口上有增删改查的注解，那么会执行注解上的SQL，而不是执行映射文件的**
+
+#### **xml文件介绍**
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- 
+  在最外层使用 <mapper> 标签包裹，表明这是一个SQL映射文件
+  namespace：告诉框架所映射的DAO接口（全限定类名）
+-->
+<mapper namespace="com.cx.dao.UserDao">
+    <!--
+      SQL映射文件统一也需要使用以下四个标签来表明SQL的类型
+      以下四个标签必须指定id，id为Dao接口的方法名称
+      框架会根据名称进行映射处理
+    -->
+    <insert id="Dao接口方法名称">
+        <!--编写插入SQL逻辑-->
+    </insert>
+    
+    <delete id="Dao接口方法名称">
+        <!--编写删除SQL逻辑-->
+    </delete>
+    
+    <update id="Dao接口方法名称">
+        <!--编写修改SQL逻辑-->
+    </update>
+    
+    <select id="">
+        <!--编写查询SQL逻辑-->
+    </select>
+</mapper>
+```
+
+#### **Select标签介绍**
+
+```xml
+<!--
+   类的字段与SQL字段映射
+-->
+<resultMap id="result">
+    <!--
+      使用 <result> 来指明映射规则
+      property：类的字段名
+      column：数据库的字段名
+      例如：
+         property="name" column="user_name"
+         会把数据库中 user_name 字段映射到类上的 name 字段
+    -->
+    <result property="" column=""></result>
+</resultMap>
+
+<!--
+   resultMap：指定映射逻辑。
+              在查询结束后，会将结果根据Dao接口方法的返回值进行封装返回，如果不指定，默认使用类的字段名
+              如果指定，则引用 <resultMap> 的id属性即可
+-->
+<select id="" resltMap="result">
+    <!--编写查询SQL逻辑-->
+</select>
+```
+
+#### 动态SQL
+
+`xml`文件不仅仅只支持普通SQL的编写，还支持编写动态的SQL语句，根据条件判断来生成对应的SQL
+
+注意：**在使用动态SQL标签时，如果需要使用到布尔表达式，并且想使用Dao方法的参数列表的话，就需要与参数名对应，如果参数是对象，则需要在前面加上`$`来区分。**
+
+- 如：
+
+  - ```java
+    @Mapper
+    public interface UserDao{
+     User getUser(@Param("name") String name,@Param("user") User user);
+    }
+    ```
+
+  - ```xml
+    <mapper namespace="xxx.UserDao">
+      <select id="getUser">
+        SELECT * FROM table_name 
+        <!--如果参数中的name != null，则并且该语句到SQL中-->
+        <if text="name != null">
+          WHERE user_name = #{name}
+        </if>
+        <!--如果引用了对象的参数，则需要再前面使用$来表示这是一个引用，在后面.字段名称-->
+        <if text="$user.age > 18">
+          AND #{user.age} > 18
+        </if>
+      </select>
+    </mapper>
+    ```
+
+
+
+##### if
+
+- 介绍：使用逻辑判断动态的为SQL语句添加新SQL
+
+- 属性：
+
+  - `text`：布尔表达式，根据该表达式校验是否需要添加if语句块中的SQL
+
+- 示例：
+
+  - ```xml
+    <mapper namespace="xxx.UserDao">
+      <select id="getUser">
+        SELECT * FROM table_name 
+        <if text="name != null">
+          WHERE user_name = #{name}
+        </if>
+        <if text="$user.age > 18">
+          AND #{user.age} > 18
+        </if>
+      </select>
+    </mapper>
+    ```
+
+
+
+##### switch
+
+- 介绍：同Java语言的where，根据条件来决定添加哪条分支的SQL
+
+- 属性：
+
+  - `text`：布尔表达式，根据该表达式校验是否需要添加case语句块中的SQL
+
+- 子标签：
+
+  - `case`：同`Java`的case语句，表示一个分支，只能满足一个case的条件
+
+- 示例：
+
+  - ```xml
+    <select id="getUser">
+        SELECT * FROM user WHERE 
+        <switch>
+            <case text="name != null">
+                user_name = #{name}
+            </case>
+            <case text="uid != null">
+                uid = #{uid}
+            </case>
+            <default>
+                xxx = #{xxx}
+            </default>
+        </switch>
+    </select>
+    ```
+
+
+
+##### where
+
+- 介绍：使用传统的方式拼接 where 子句存在一些问题，比如需要判断每个条件是否满足，以及在不同条件组合时需要添加适当的逻辑操作符（如 AND 或 OR）。而 `<where>` 标签正是为了解决这些问题而设计的。
+
+- 子标签：
+
+  - `if`：根据if的判断来决定是否动态添加该SQL（如果if语句块的SQL前面有一些逻辑操作符，在进行第一次添加时，会自动将该操作符抹去）。
+
+- 示例：
+
+  - 
+
+  - ```xml
+    <select id="getUser">
+        SELECT * FROM user
+        <!--
+          使用 where 标签，动态的生成 WHERE语句
+          如果没有一个if标签的条件满足，则不会生成 where 语句
+          如果某个if标签是第一个条件满足，但是它的语句中有逻辑操作符，底层会自动抹除这个操作符
+        -->
+        <where>
+            <if text="name != null">
+                and user_name = #{name}
+            </if>
+            <if text="pwd != null">
+                and pass_word = #{pwd}
+            </if>
+        </where>
+    </select>
+    ```
+
+
+
+##### include
+
+- 介绍：可以将SQL语句写在外边，通过该标签引入，减少冗余
+
+- 属性：
+
+  - `refid`：需要引入的`<sql>`的id
+
+- 示例：
+
+  - 
+
+  - ```xml
+    <select id="removeUsers">
+        <!--引入SQL片段-->
+        <include refid="sql"/>
+    </select>
+    <sql id="sql">
+        DELETE FROM user
+    </sql>
+    ```
+
+
+
+##### foreach
+
+- 介绍：**便利集合。循环动态添加SQL。可以用于执行一些批量操作**
+
+- 属性：
+
+  - `collection`：Dao方法参数中集合对应的key
+  - `item`：为集合中每个元素进行命名。（如果是引用类型，则需要使用item.属性来获取该值）
+  - `open`：起始符号。默认为`(`
+  - `close`：结束符号。默认为`)`
+  - `separator`：分隔符。默认为`,`
+
+- 示例：
+
+  - ```xml
+    <!--
+      以下是进行批量删除的操作
+    -->
+    <delete id="removeAll">
+        DELETE FROM user WHERE id IN
+        <foreach collection="list" item="id" open="(" close=")" separator=",">
+            #{id}
+        </foreach>
+    </delete>
+    ```
+
+
 
 **注意：框架暂时没有实现对事务处理的功能，请等待后续版本中更新。**
 
@@ -620,3 +864,7 @@ public class MyBean implements InitializingBean {
 ### SpringBeanMethodHandler
 
 **Bean方法处理器**。对所有在`IOC中的Bean`的方法进行处理。
+
+### SpringFileHandler
+
+文件处理器，如果扫描到的文件不是一个`.class`，则会教给该处理器进行处理

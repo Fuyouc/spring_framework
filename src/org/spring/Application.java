@@ -7,7 +7,7 @@ public final class Application {
     /**
      * 框架版本
      */
-    public static final String VERSION = "2.0.1";
+    public static final String VERSION = "2.0.5";
 
     private static Class<?> runClass;
 

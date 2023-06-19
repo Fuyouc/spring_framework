@@ -15,6 +15,9 @@ public class StringUtils {
         return "".equals(str) || null == str || "null".equals(str);
     }
 
+    public static String getValue(String value,String defaultValue){
+        return ObjectUtils.isEmpty(value) ? defaultValue : value;
+    }
 
     //是否是int类型
     public static boolean isInteger(String str) {
@@ -330,5 +333,9 @@ public class StringUtils {
             prefix = prefix.substring(0,prefix.lastIndexOf("/"));
         }
         return "".equals(prefix) ? "/" : prefix;
+    }
+
+    public static String replaceFirst(String string,String placeholder,String value){
+        return string.replaceFirst(placeholder,value);
     }
 }

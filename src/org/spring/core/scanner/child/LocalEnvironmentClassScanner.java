@@ -1,11 +1,15 @@
 package org.spring.core.scanner.child;
 
+import org.spring.Application;
+import org.spring.core.container.files.SpringFile;
 import org.spring.core.loader.SpringFrameWorkClassLoader;
 import org.spring.core.scanner.SpringWebClassScanner;
 import org.spring.utils.global.ClassUtils;
 import org.spring.utils.global.FileUtils;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.UnsupportedEncodingException;
 
 /**
@@ -58,6 +62,12 @@ public class LocalEnvironmentClassScanner implements SpringWebClassScanner {
             String classPath = FileUtils.getFileClassPath(applicationClass, classFile);
             Class<?> classObj = Class.forName(classPath);
             SpringFrameWorkClassLoader.loadClass(classObj);
+        }else {
+            try {
+                Application.getApplicationContext().getFactory().getFileFactory().add(new SpringFile(classFile.getName(),new FileInputStream(classFile)));
+            } catch (FileNotFoundException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
 }

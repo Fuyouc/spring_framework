@@ -1,10 +1,13 @@
 package org.spring.jdbc.sql.execute.handler.sql_handler.select.child;
 
 
+import org.spring.annotations.autoconfig.Autowired;
 import org.spring.annotations.autoconfig.Component;
 import org.spring.jdbc.annotation.TableField;
+import org.spring.jdbc.sql.DaoMethod;
 import org.spring.jdbc.sql.execute.handler.sql_handler.select.DaoMethodReturnTypeHandler;
 import org.spring.utils.global.ClassUtils;
+import org.spring.utils.global.ObjectUtils;
 import org.spring.utils.global.StringUtils;
 
 import java.lang.reflect.Field;
@@ -24,14 +27,16 @@ import java.util.Map;
  */
 @Component
 public class DaoMethodListReturnType implements DaoMethodReturnTypeHandler {
+
     @Override
-    public Object handler(Method method, ResultSet resultSet) {
+    public Object handler(DaoMethod daoMethod, ResultSet resultSet) {
+        Method method =daoMethod.getMethod();
         Type returnType = method.getGenericReturnType();
         Type[] actualTypeArguments = ((ParameterizedType) returnType).getActualTypeArguments();
         Type elementType = actualTypeArguments[0];
         if (elementType instanceof Class){
             //如果是
-            return object(method,resultSet);
+            return object(daoMethod,resultSet);
         }else {
             ParameterizedType parameterizedType = ((ParameterizedType) elementType);
             Type rawType = parameterizedType.getRawType();
@@ -72,7 +77,8 @@ public class DaoMethodListReturnType implements DaoMethodReturnTypeHandler {
         return null;
     }
 
-    private Object object(Method method,ResultSet resultSet){
+    private Object object(DaoMethod daoMethod,ResultSet resultSet){
+        Method method = daoMethod.getMethod();
         List<Object> result = new ArrayList<>();
         Type[] actualTypeArguments = ((ParameterizedType) method.getGenericReturnType()).getActualTypeArguments();
         try {
@@ -81,29 +87,11 @@ public class DaoMethodListReturnType implements DaoMethodReturnTypeHandler {
              */
             Class<?> targetClass = Class.forName(actualTypeArguments[0].getTypeName());
             while (resultSet.next()){
-                //根据目标class对象创建目标类
-                Object tagObj = ClassUtils.object(targetClass);
-                Field[] declaredFields = tagObj.getClass().getDeclaredFields();
-                for (Field field : declaredFields) {
-                    try {
-                        field.setAccessible(true);
-                        String fieldName = null;
-                        //如果类上有注解，则使用注解的内容当做字段名
-                        if (field.getAnnotation(TableField.class) != null) fieldName = field.getAnnotation(TableField.class).value();
-                        if (StringUtils.isEmpty(fieldName)){
-//                            if (JdbcUtils.isHump()){
-//                                //如果开启驼峰命名，则将其转换
-//                                fieldName = StringUtils.transLine(field.getName());
-//                            }else {
-//                                fieldName = field.getName(); //如果字段名，则使用类名中的字段名
-//                            }
-                        }
-                        field.set(tagObj,resultSet.getObject(resultSet.findColumn(fieldName))); //根据字段名称与数据库列关联，并赋值到对象上
-                    } catch (IllegalAccessException e) {
-                        e.printStackTrace();
-                    }
+                if (!ObjectUtils.isEmpty(daoMethod.getMapper())){
+                    result.add(DaoMethodObjectReturnType.object(targetClass,daoMethod,resultSet)); //添加到结果集中
+                }else {
+                    result.add(DaoMethodObjectReturnType.object(targetClass, method, resultSet)); //添加到结果集中
                 }
-                result.add(tagObj); //添加到结果集中
             }
         } catch (ClassNotFoundException | SQLException classNotFoundException) {
             classNotFoundException.printStackTrace();

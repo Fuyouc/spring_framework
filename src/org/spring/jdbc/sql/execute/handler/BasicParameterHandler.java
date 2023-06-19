@@ -15,8 +15,7 @@ import java.util.Map;
 @Component
 public class BasicParameterHandler implements SQLParameterValueHandler {
     @Override
-    public Map<String, Object> handler(Parameter parameter, Object value) {
-        String key = parameter.getName();
+    public Map<String, Object> handler(String key,Parameter parameter, Object value) {
         Map<String,Object> map = new HashMap<>();
         if (!ObjectUtils.isEmpty(parameter.getAnnotation(Param.class))){
             key = parameter.getAnnotation(Param.class).value();

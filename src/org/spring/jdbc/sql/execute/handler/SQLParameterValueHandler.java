@@ -8,7 +8,7 @@ public interface SQLParameterValueHandler {
     /**
      * 处理dao方法各个类型的参数与参数值，封装成一个Map返回
      */
-    Map<String,Object> handler(Parameter parameter,Object value);
+    Map<String,Object> handler(String key,Parameter parameter,Object value);
 
     /**
      * 判断是否处理该类型的参数

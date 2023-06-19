@@ -16,6 +16,15 @@ import java.lang.reflect.Method;
  */
 public class DaoInterfaceProxy implements InvocationHandler {
 
+    private String name;
+
+    private Class<?> daoClass;
+
+    public DaoInterfaceProxy(String name, Class<?> daoClass) {
+        this.name = name;
+        this.daoClass = daoClass;
+    }
+
     @Override
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         return run(method,args);
@@ -28,12 +37,7 @@ public class DaoInterfaceProxy implements InvocationHandler {
      * @return 方法执行返回类型
      */
     public Object run(Method method,Object[] parameterValue) throws InstantiationException, IllegalAccessException {
-        for (Annotation annotation : method.getAnnotations()) {
-            if (!ObjectUtils.isEmpty(annotation.annotationType().getAnnotation(SQL.class))){
-                DaoHandler daoHandler = Application.getApplicationContext().getFactory().getBeanFactory().getBean(JDBCDaoHandler.class.getName());
-                return daoHandler.executeSQL(method,parameterValue);
-            }
-        }
-        return null;
+        DaoHandler daoHandler = Application.getApplicationContext().getFactory().getBeanFactory().getBean(JDBCDaoHandler.class.getName());
+        return daoHandler.executeSQL(name,daoClass,method,parameterValue);
     }
 }

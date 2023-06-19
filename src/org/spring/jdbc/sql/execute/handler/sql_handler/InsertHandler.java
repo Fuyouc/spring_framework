@@ -1,9 +1,12 @@
 package org.spring.jdbc.sql.execute.handler.sql_handler;
 
 import org.spring.annotations.autoconfig.Component;
+import org.spring.core.parser.xml.Element;
 import org.spring.jdbc.annotation.Insert;
+import org.spring.jdbc.sql.DaoMethod;
 import org.spring.jdbc.utils.SQLStringUtils;
 import org.spring.utils.global.ClassUtils;
+import org.spring.utils.global.ObjectUtils;
 
 import java.lang.reflect.Method;
 import java.sql.PreparedStatement;
@@ -11,14 +14,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Component
-public class InsertHandler implements SQLHandler {
-    @Override
-    public String processSQL(Method method, String SQL) {
-        if (method.getAnnotation(Insert.class).autoSplicing()){
-            return autoSplicing(SQL);
-        }else return SQL;
-    }
-
+public class InsertHandler extends AbstractSQLHandler{
     private String autoSplicing(String sql){
         StringBuilder sb = new StringBuilder(sql.substring(0,12));
         String tableName = sql.substring(12,sql.length());
@@ -40,12 +36,17 @@ public class InsertHandler implements SQLHandler {
     }
 
     @Override
-    public Object executeSQL(Method method,PreparedStatement ps) throws SQLException {
-        return result(method,ps.executeUpdate());
+    protected void xmlSQL(DaoMethod daoMethod) {
+
     }
 
-    private Object result(Method method,int result){
-        Class<?> returnType = method.getReturnType();
+    @Override
+    public Object executeSQL(DaoMethod daoMethod,PreparedStatement ps) throws SQLException {
+        return result(daoMethod,ps.executeUpdate());
+    }
+
+    private Object result(DaoMethod daoMethod,int result){
+        Class<?> returnType = daoMethod.getMethod().getReturnType();
         if (ClassUtils.isBoolean(returnType)){
             return result > 0;
         }else if (ClassUtils.isInt(returnType)){

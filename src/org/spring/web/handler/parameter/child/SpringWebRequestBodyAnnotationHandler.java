@@ -27,24 +27,26 @@ public class SpringWebRequestBodyAnnotationHandler implements SpringWebRequestPa
         }
         String json = (String) cache.get("json");
         Object result = null;
-        if ('{' == json.charAt(0)){
-            JSONObject jsonObject = null;
-            if (!cache.containsKey("object")){
-                jsonObject = JSONObject.parseObject(json);
-                cache.put("object",jsonObject);
-            }else {
-                jsonObject = (JSONObject) cache.get("object");
+        if (json != null && !"".equals(json)) {
+            if ('{' == json.charAt(0)) {
+                JSONObject jsonObject = null;
+                if (!cache.containsKey("object")) {
+                    jsonObject = JSONObject.parseObject(json);
+                    cache.put("object", jsonObject);
+                } else {
+                    jsonObject = (JSONObject) cache.get("object");
+                }
+                result = jsonObject(jsonObject, parameter);
+            } else if ('[' == json.charAt(0)) {
+                JSONArray jsonArray = null;
+                if (!cache.containsKey("array")) {
+                    jsonArray = JSONArray.parseArray(json);
+                    cache.put("array", jsonArray);
+                } else {
+                    jsonArray = (JSONArray) cache.get("array");
+                }
+                result = jsonArray(jsonArray, parameter);
             }
-            result = jsonObject(jsonObject,parameter);
-        }else if ('[' == json.charAt(0)){
-            JSONArray jsonArray = null;
-            if (!cache.containsKey("array")){
-                jsonArray = JSONArray.parseArray(json);
-                cache.put("array",jsonArray);
-            }else {
-                jsonArray = (JSONArray) cache.get("array");
-            }
-            result = jsonArray(jsonArray,parameter);
         }
         return new AbstractMap.SimpleEntry<>(true,result);
     }

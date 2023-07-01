@@ -4,12 +4,11 @@ import org.spring.Application;
 import org.spring.annotations.autoconfig.Component;
 import org.spring.annotations.autoconfig.Value;
 import org.spring.core.resources.SpringFrameworkResourceManager;
+import org.spring.jdbc.annotation.Param;
 import org.spring.utils.global.ValueUtils;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Iterator;
 
 /**

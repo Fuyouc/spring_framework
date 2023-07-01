@@ -7,10 +7,12 @@ import org.spring.annotations.autoconfig.Component;
 import org.spring.core.container.web.RequestMappingObject;
 import org.spring.utils.global.ClassUtils;
 import org.spring.utils.global.ObjectUtils;
+import org.spring.web.annotations.InterceptIgnore;
 import org.spring.web.annotations.handler.SpringWebControllerExceptionHandler;
 import org.spring.web.annotations.request.HttpRequestMethod;
 import org.spring.web.exception.HttpRequestMethodNotSupportedException;
 import org.spring.web.handler.parameter.SpringWebRequestParameterHandler;
+import org.spring.web.json.annotations.JsonIgnore;
 import org.spring.web.server.filter.SpringHttpFilterHandler;
 import org.spring.web.server.servlet.SpringHttpServletHandler;
 import org.spring.web.server.servlet.interceptor.SpringWebInterceptor;
@@ -108,13 +110,31 @@ public class SpringWebHttpAPIServletHandler implements SpringHttpServletHandler 
 
     private Map.Entry<Boolean,Object> handlerRequest(RequestMappingObject obj,HttpServletRequest request,HttpServletResponse response) throws Exception {
         Method method = obj.invokeMethod(); //获取目标方法对象
-        List<SpringWebInterceptor> springWebInterceptors = Application.getApplicationContext().getFactory().getWebFactory().getWebInterceptor(request.getRequestURI());
-        for (SpringWebInterceptor webInterceptor : springWebInterceptors) {
-            if (webInterceptor.beforeHandler(request, response, obj.invokeMethod(), obj.getController())) {
-                //如果被拦截，则直接返回，不进行任何处理（需要用户手动通过 response 响应给客户端信息）
-                return new AbstractMap.SimpleEntry<>(false, null);
+        Object methodResult = null;
+        boolean interceptor = method.getAnnotation(InterceptIgnore.class) == null ? false : true;
+        if (interceptor) {
+            List<SpringWebInterceptor> springWebInterceptors = Application.getApplicationContext().getFactory().getWebFactory().getWebInterceptor(request.getRequestURI());
+            for (SpringWebInterceptor webInterceptor : springWebInterceptors) {
+                if (webInterceptor.beforeHandler(request, response, obj.invokeMethod(), obj.getController())) {
+                    //如果被拦截，则直接返回，不进行任何处理（需要用户手动通过 response 响应给客户端信息）
+                    return new AbstractMap.SimpleEntry<>(false, null);
+                }
             }
+            methodResult = handlerServletMethod(obj, request, response);
+            for (SpringWebInterceptor webInterceptor : springWebInterceptors) {
+                if (webInterceptor.afterHandler(request, response, method, methodResult)) {
+                    //如果被拦截，则直接返回，不进行任何处理（需要用户手动通过 response 响应给客户端信息）
+                    return new AbstractMap.SimpleEntry<>(false, null);
+                }
+            }
+        }else {
+            methodResult = handlerServletMethod(obj,request,response);
         }
+        return new AbstractMap.SimpleEntry<>(true,methodResult);
+    }
+
+    private Object handlerServletMethod(RequestMappingObject obj,HttpServletRequest request,HttpServletResponse response) throws Exception{
+        Method method = obj.invokeMethod(); //获取目标方法对象
         Object methodResult = null;
         Map<String, Object> cache = new HashMap<>();
         if (method.getParameterCount() > 0) {
@@ -139,13 +159,7 @@ public class SpringWebHttpAPIServletHandler implements SpringHttpServletHandler 
         }else {
             methodResult = method.invoke(obj.getController(), null);
         }
-        for (SpringWebInterceptor webInterceptor : springWebInterceptors) {
-            if (webInterceptor.afterHandler(request, response, method,methodResult)) {
-                //如果被拦截，则直接返回，不进行任何处理（需要用户手动通过 response 响应给客户端信息）
-                return new AbstractMap.SimpleEntry<>(false, null);
-            }
-        }
-        return new AbstractMap.SimpleEntry<>(true,methodResult);
+        return method;
     }
 
 }

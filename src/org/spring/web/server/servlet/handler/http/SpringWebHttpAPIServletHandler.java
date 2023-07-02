@@ -111,7 +111,7 @@ public class SpringWebHttpAPIServletHandler implements SpringHttpServletHandler 
     private Map.Entry<Boolean,Object> handlerRequest(RequestMappingObject obj,HttpServletRequest request,HttpServletResponse response) throws Exception {
         Method method = obj.invokeMethod(); //获取目标方法对象
         Object methodResult = null;
-        boolean interceptor = method.getAnnotation(InterceptIgnore.class) == null ? false : true;
+        boolean interceptor = method.getAnnotation(InterceptIgnore.class) == null ? true : false;
         if (interceptor) {
             List<SpringWebInterceptor> springWebInterceptors = Application.getApplicationContext().getFactory().getWebFactory().getWebInterceptor(request.getRequestURI());
             for (SpringWebInterceptor webInterceptor : springWebInterceptors) {

@@ -34,7 +34,7 @@ public class SpringWebRequestPartAnnotationHandler implements SpringWebRequestPa
     @Override
     public Map.Entry<Boolean,Object> handler(HttpServletRequest request, HttpServletResponse response, Method method, Parameter parameter, Map<String,Object> cache) throws Exception{
         if (!request.getMethod().equals("POST")) throw new HttpRequestMethodNotSupportedException("不是一个POST请求，无法获取@RequestPart的参数");
-        if (request.getContentType().startsWith("application/json")) return null;
+        if (request.getContentType() == null || request.getContentType().startsWith("application/json")) return null;
 
 
         Map<String,Object> body = null;

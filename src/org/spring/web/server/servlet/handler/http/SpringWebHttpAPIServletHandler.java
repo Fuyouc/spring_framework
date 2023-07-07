@@ -159,7 +159,7 @@ public class SpringWebHttpAPIServletHandler implements SpringHttpServletHandler 
         }else {
             methodResult = method.invoke(obj.getController(), null);
         }
-        return method;
+        return methodResult ;
     }
 
 }

@@ -53,7 +53,7 @@ public class SpringWebRequestPartAnnotationHandler implements SpringWebRequestPa
             body = cache;
         }
         RequestPart part = parameter.getAnnotation(RequestPart.class);
-        String key = ObjectUtils.isEmpty(part) ? parameter.getName() : part.value();
+        String key = StringUtils.isEmpty(part.value()) ? parameter.getName() : part.value();
         Object result = null;
         Class<?> type = parameter.getType();
         if (ClassUtils.isWrapClass(type)){

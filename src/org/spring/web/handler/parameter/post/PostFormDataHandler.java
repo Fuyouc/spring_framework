@@ -33,7 +33,6 @@ public class PostFormDataHandler implements PostMethodParameterHandler {
     public Map.Entry<Boolean,Map<String,Object>> handler(HttpServletRequest request, Method method, Parameter parameter) {
         Map<String,Object> map = new HashMap<>();
         String bodyString = ((SpringWebServletRequestWrapper) request).getBodyString(); //获取bodyString
-        System.out.println(bodyString);
         StringUtils.getPostFormBodyData(bodyString, new PostFormDataBodyListener() {
             @Override
             public void parameter(int position,String key, String value) {

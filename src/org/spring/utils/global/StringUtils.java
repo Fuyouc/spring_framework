@@ -201,7 +201,7 @@ public class StringUtils {
     }
 
     public static void getPostFormBodyData(String bodyString, PostFormDataBodyListener listener){
-        String regex = "-{28,}[0-9]+";
+        String regex = "[-]+[0-9a-zA-Z]+";
         boolean isHandlerFile = false;
         String[] bracketContent = bodyString.split(regex);
         for (int i = 1; i < bracketContent.length - 1; i++) {
